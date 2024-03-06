@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js" ></script>
+    <script>
+    // AJAX
+        // axios.get("https://www.zerocho.com/api/get")
+        //     .then((result) => {
+        //         console.log(result);
+        //         console.log(result.data); //{}
+        //     })
+        //     .catch((error) => {
+        //         console.error(error);
+        //     })
+        
+        // async 형태로 변환
+        // 익명 함수라서 소괄호로 감싸 호출
+        // (async () => {
+        //     try {
+        //         const result = await axios.get("https://www.zerocho.com/api/get");
+        //         console.log(result);
+        //         console.log(result.data);
+        //     } catch (error){
+        //         console.error(error);
+        //     }
+        // })();
+
+        // POST 방식 요청 보내기, 방화벽 막혀서 안가는 듯 보임
+        // (async () => {
+        //     try {
+        //         const result = await axios.post('https://www.zerocho.com/api/post/json', {
+        //             name : 'zerocho',
+        //             birth : 1994
+        //         });
+        //         console.log(result);
+        //         console.log(result.data); //{}
+        //     } catch (error){
+        //         console.error(error);
+        //     }
+        // })();
+
+    // FormData
+        // const formData = new FormData();
+        // formData.append('name', 'zerocho');
+        // formData.append('item', 'orange');
+        // formData.append('item', 'melon');
+        // formData.has('item'); //true
+        // formData.has('money'); //false
+        // formData.get('item') // orange
+        // formData.getAll('item') // ['orange', 'melon']
+        // formData.append('test', ['hi', 'zero']);
+        // formData.get('test'); //hi, zero
+        // formData.delete('test');
+        // formData.get('test'); //null
+        // formData.set('item', 'apple');
+        // formData.getAll('item'); //['apple']
+
+        // // 위의 formData를 POST 방식 요청 보내기
+        // (async () => {
+        //     try {
+        //         const result = await axios.post('https://www.zerocho.com/api/post/formdata', formData);
+        //         console.log(result);
+        //         console.log(result.data); //{}
+        //     } catch (error){
+        //         console.error(error);
+        //     }
+        // })();
+
+        // (async () => {
+        //     try {
+        //         const result = await axios.post(`https://www.zerocho.com/api/search/
+        //         ${encodeURIComponent('노드')}`, formData);
+        //         console.log(result);
+        //         console.log(result.data); //{}
+        //     } catch{
+        //         console.error(error);
+        //     }
+        // })
+
+    //     var sayNode = function(){
+    //         console.log("Node");
+    //     }
+    //     var es = 'ES';
+    //    const newObject = {
+    //     sayJS(){
+    //         console.log("JS")
+    //     },
+    //     sayNode,
+    //     [es+6] : 'fantastic'
+    //    }
+    //    newObject.sayJS();
+    //    newObject.sayNode();
+    //    console.log(newObject.ES6);
+        
+
+    </script>
+</head>
+<body>
+    < <ul>
+            <!-- data- 뒤에는 마음대로 붙여서 식별해도 된다. 사이사이 "-" 는 없어지고 no, userHobby가 된다 -->
+        <li data-no="1" data-user-hobby="programmer">Zero</li>
+        <li data-id="2" data-user-job="designer">Nero</li>
+        <li data-id="3" data-user-job="programmer">Hero</li>
+        <li data-id="4" data-user-job="ceo">Kero</li>
+    </ul> 
+    <script>
+        console.log(document.querySelector('li').dataset);
+        // {id : '1', userJob="programmer"}
+    </script>
+</body>
+</html>

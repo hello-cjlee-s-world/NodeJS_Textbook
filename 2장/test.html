@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js" ></script>
+    <script>
+    const test = function(){
+        this.a='a';
+        this.b='b';
+    }
+    test.prototype.c = 'c';
+    const testCon = new test();
+    console.log(testCon);
+    console.log(test.prototype);
+    console.log(test);
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
