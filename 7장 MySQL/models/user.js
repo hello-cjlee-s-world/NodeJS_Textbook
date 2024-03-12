@@ -25,8 +25,7 @@ module.exports = class User extends Sequelize.Model {
                 allowNull: false,
                 defaultValue: Sequelize.NOW
             }
-
-        },{
+        }, {
             sequelize,
             timestamps: false,
             underscored: false,
@@ -35,7 +34,9 @@ module.exports = class User extends Sequelize.Model {
             paranoid: false,
             charset: 'utf8',
             collate: 'utf8_general_ci'
-        })
+        });
     }
-    static associate(db){}
+    static associate(db){
+        db.User.hasMany(db.Comment, {foreignKey: 'commenter', targetKey: 'id'});
+    }
 };
