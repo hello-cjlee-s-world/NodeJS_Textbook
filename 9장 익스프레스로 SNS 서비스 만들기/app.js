@@ -31,10 +31,9 @@ sequelize.sync({ force: false })
     .catch((err) => {
         console.error(err);
     });
-
 app.use(morgan('combined'));
-app.use(express.static(path.join(__dirname ,"public")));
-app.use('img', express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(__dirname ,'public')));
+app.use('/img', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended : false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -50,8 +49,7 @@ app.use(session({
 app.use(passport.initialize());
  // 여기서 매 요청시 마다 ./passport/index.js 의 deserializeUser 를 호출한다.(세션에 저장한 아이디를 통해 사용자 정보 객체를 불러옴)
 app.use(passport.session());
-
-app.use('/', pageRouter);
+app.use('/', pageRouter);   
 app.use('/auth', authRouter);
 app.use('/post', postRouter);
 app.use('/user', userRouter);

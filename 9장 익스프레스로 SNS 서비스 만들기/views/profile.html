@@ -4,18 +4,20 @@
 <div class="timeline">
     <div class="following half">
         <h2>팔로잉 목록</h2>
-        {% if user.Followings %}
-            {% for following in user.Followings %}
-            <div>{{following.nick}}</div>
-            {% endfor }
+        {% if Followings %}
+            {% for following in Followings %}
+            <div>{{following.followingId}}</div>
+            {% endfor %}
         {% endif %}
     </div>
     <div class="followers half">
         <h2>팔로우 목록</h2>
-        {% if user.Followers %}
-            {% for follower in user.Followers %}
-            <div>{{follower.nick}}</div>
+        {% if Followers %}
+            {% for follower in Followers %}
+            <div>{{follower}}</div>
             {% endfor %}
+        {% else %}
+        <div>없음</div>
         {% endif %}
     </div>
 </div>

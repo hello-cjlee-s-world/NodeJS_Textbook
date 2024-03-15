@@ -13,18 +13,20 @@ module.exports = () => {
     passport.deserializeUser((id, done) => {
         User.findOne({
             where: { id },
-            inclulde: [{
+            include: [{
                 model: User,
                 attributes: ['id', 'nick'],
-                as: 'followers'
+                as: 'Followers'
             }, {
                 model: User,
                 attributes: ['id', 'nick'],
-                as: 'Follwings'
+                as: 'Followings'
             }]
         })
-            .then(user => done(null, user))
-            .catch(err => done(err));
+        .then(user => {
+            done(null, user)
+        })
+        .catch(err => {done(err)});
     })
     local();
     kakao();

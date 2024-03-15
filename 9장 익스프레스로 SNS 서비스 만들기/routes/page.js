@@ -1,6 +1,8 @@
 const express = require('express');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
-const { Post, User, Hashtag } = require('../models')
+const { Quertytypes } = require('sequelize');
+const { Post, User, Hashtag, sequelize } = require('../models');
+const { QueryTypes } = require('sequelize');
 
 const router = express.Router();
 
@@ -12,23 +14,34 @@ router.use((req, res, next) => {
     next();
 });
 
-router.get('/profile', isLoggedIn,(req, res) => {
-    res.render('profile', { title: '내 정보 - NodeBird' });
-});
+router.get('/profile', isLoggedIn, async (req, res, next) => {
+    try {
+        let query = `SELECT followingId FROM follow WHERE followerId = ${req.user.id}`
+        const followings = await sequelize.query(query, {
+            type: QueryTypes.SELECT,
+        });
+        query = `SELECT followerId FROM follow WHERE followingId = ${req.user.id}`
+        const followers = await sequelize.query(query, {
+            type: QueryTypes.SELECT,
+        });
+        console.log(followings);
+        console.log(followers);
+        res.render('profile', {
+            title : 'NodeBird - 내 정보',
+            Followings : followings,
+            Followers : followers
+        });
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }   
+})
 
 router.get('/join', isNotLoggedIn, (req, res) => {
     res.render('join', { title : '회원가입 - NodeBird' });
 });
 
-// router.get('/', (req, res, next) => {
-//     const twits = [];
-//     res.render('main',{
-//         title: 'NodeBird',
-//         twits
-//     });
-// });
-
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
         const posts = await Post.findAll({
             include: {
@@ -37,6 +50,7 @@ router.get('/', async (req, res) => {
             },
             order: [['createdAt', 'DESC']]
         });
+        //console.log(posts);
         res.render('main', {
             title: 'NodeBird',
             twits: posts
