@@ -19,7 +19,7 @@
             </div>
         </form>
     </div>
-    {% endif %}
+    
     <div class="twits">
         <form id="hashtag-form" action="/hashtag">
             <input type="text" name="hashtag" placeholder="태그 검색">
@@ -40,7 +40,9 @@
         </div>
         {% endfor %}
     </div>
+    {% endif %}
 </div>
+
 {% endblock %}
 
 {% block script %}
