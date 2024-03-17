@@ -1,15 +1,29 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const url = require('url');
 
-const { verifyToken, deprecated } = require('./middlewares');
+const { verifyToken, apiLimiter } = require('./middlewares');
 const { Domain, User, Hashtag, Post } = require('../models');
 
 const router = express.Router();
 
-// 더 이상 사용할 수 없게 함.
-router.use(deprecated);
+router.use(async (req, res, next) => {
+    console.log('origin : ' ,req.get('origin').host);
+    const domain = await Domain.findOne({
+        where: {host: url.parse(req.get('origin')).host}
+    });
+    if (domain) {
+        cors({
+            origin: req.get('origin'),
+            credentials: true
+        })(req, res, next);
+    } else {
+        next();
+    }
+});
 
-router.post('/token', async (req, res) => {
+router.post('/token', apiLimiter, async (req, res) => {
     const { clientSecret } = req.body;
     try {
         const domain = await Domain.findOne({
@@ -46,11 +60,11 @@ router.post('/token', async (req, res) => {
 });
 
 // 토큰 테스트
-router.get('/test', verifyToken, (req, res) => {
+router.get('/test', verifyToken, apiLimiter, (req, res) => {
     res.json(req.decoded);
 });
 
-router.get('/posts/my', verifyToken, (req, res) => {
+router.get('/posts/my', apiLimiter, verifyToken, (req, res) => {
     Post.findAll({ where: { userId: req.decoded.id }}) // 토큰에서 아이디 꺼내서 내 아이디로 유저 정보 검색
         .then((posts) => {
             //console.log(posts);
@@ -68,7 +82,7 @@ router.get('/posts/my', verifyToken, (req, res) => {
         });
 });
 
-router.get('/posts/hashtag/:title', verifyToken, async(req, res) => {
+router.get('/posts/hashtag/:title', verifyToken, apiLimiter, async(req, res) => {
     try {
         const hashtag = await Hashtag.findOne({ where: { title: req.params.title } });
         //console.log(hashtag);

@@ -11,6 +11,7 @@ dotenv.config();
 const indexRouter = require('./routes');
 const authRouter = require('./routes/auth');
 const v1 = require('./routes/v1');
+const v2 = require('./routes/v2');
 const { sequelize } = require('./models');  // models/index.js 에서 export한 db 객체에서 sequelize를 가져온다
 const passportConfig = require('./passport');
 
@@ -48,6 +49,7 @@ app.use(passport.initialize());
  // 여기서 매 요청시 마다 ./passport/index.js 의 deserializeUser 를 호출한다.(세션에 저장한 아이디를 통해 사용자 정보 객체를 불러옴)
 app.use(passport.session());
 app.use('/v1', v1);
+app.use('/v2', v2);
 app.use('/auth', authRouter);
 app.use('/', indexRouter);   
 
