@@ -68,6 +68,8 @@ app.use((err, req, res, next) => {
     res.render('error');
 });
 
-app.listen(app.get('port'), () => {
-    console.log(`${app.get('port')}번으로 리슨중`);
-});
+// app.listen(app.get('port'), () => {
+//     console.log(`${app.get('port')}번으로 리슨중`);
+// });
+
+module.exports = app;
