@@ -24,14 +24,11 @@ module.exports = (server, app, sessionMiddleware) => {
 
     chat.on('connection', (socket) => {
         console.log('chat 네임스페이스에 접속');
-        console.log(socket.handshake.query.roomId)
         const req = socket.request;
         const { headers: {referer} } = req
         const roomId = referer
-            .split('/')[referer.split('/').length -1]
-            .replace(/\?.+/,'');
-        console.log('roomId :', roomId);
-        console.log('requst :', req.headers);
+        .split('/')[referer.split('/').length -1]
+        .replace(/\?.+/,'');       
         socket.join(roomId);
         socket.to(roomId).emit('join', {
             user: 'system',
