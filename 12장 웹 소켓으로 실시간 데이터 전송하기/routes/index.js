@@ -1,4 +1,7 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const Room = require('../models/room');
 const Chat = require('../models/chat');
@@ -50,10 +53,14 @@ router.get('/room/:id', async (req, res, next) => {
         if(rooms && rooms[req.params.id] && room.max <= rooms[req.params.id].length) {
             return res.redirect('/?error=허용 인원을 초과했습니다.')
         }
+        const chats = (await Chat.findAll({ 
+           where: { 'rid': room.rid },
+           order: [['created_at', 'ASC']]
+        }));
         return res.render('chat', {
             room,
             title: room.title,
-            chats: [],
+            chats,
             user: req.session.color
         });
     } catch (error) {
@@ -64,7 +71,7 @@ router.get('/room/:id', async (req, res, next) => {
 
 router.delete('/room/:id', async (req, res, next) => {
     try {
-        console.log(req.params.id);
+        console.log('testset: ',req.params.id);
         await Room.destroy({ where : { rid: req.params.id }});
         await Chat.destroy({ where : { rid: req.params.id }});
         res.send('of');
@@ -75,6 +82,61 @@ router.delete('/room/:id', async (req, res, next) => {
         console.error(error);
         return next(error);
     }
-} )
+} );
+
+router.post('/room/:id/chat', async (req, res, next) => {
+    try {
+        const chat = await Chat.create({
+            rid : req.params.id,
+            user: req.session.color,
+            chat: req.body.chat
+        });
+        console.log(chat);
+        req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
+        res.send('ok');
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+});
+
+
+// 파일 업로드 관련
+try {
+    fs.readdirSync('uploads');
+} catch (error) {
+    console.error('uploads 폴더가 존재하지 않아 uploads 폴더를 생성합니다.');
+    fs.mkdirSync('uploads');
+} 
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination(req, file, done) {
+            done(null, 'uploads/');
+        },
+        filename(req, file, done) {
+            const ext = path.extname(file.originalname);
+            done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+        }
+    }),
+    limits: { fileSize: 500 * 1024 * 1024 }
+});
+
+router.post('/room/:id/gif', upload.single('gif'), async (req, res, next) => {
+    try {
+        const chat = await Chat.create({
+            rid : req.params.id,
+            user: req.session.color,
+            gif: req.file.filename
+        });
+        console.log(chat);
+        req.app.get('io').of('chat').to(req.params.id).emit('chat', chat);
+        res.send('ok');
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+});
+
 
 module.exports = router;

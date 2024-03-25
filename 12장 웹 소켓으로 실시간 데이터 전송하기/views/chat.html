@@ -11,7 +11,7 @@
             <div class="mine" style="color: {{chat.user}}">
                 <div>{{chat.user}}</div>
                 {% if chat.gif %}
-                <img src="/gif/{{chat.gif}}">
+                <img src="/gif/{{chat.gif}}" class="chat-gif">
                 {% else %}
                 <div>{{chat.chat}}</div>
                 {% endif %}
@@ -24,7 +24,7 @@
             <div class="other" style="color: {{chat.user}}">
                 <div>{{chat.user}}</div>
                 {% if chat.gif %}
-                <img src="/gif/{{chat.gif}}">
+                <img src="/gif/{{chat.gif}}" class="chat-gif">
                 {% else %}
                 <div>{{chat.chat}}</div>
                 {% endif %}
@@ -37,12 +37,12 @@
     <label for="gif">GIF 올리기</label>
     <input type="file" id="gif" name="gif" accept="image/gif">
     <input type="text" id="chat" name="chat">
+    <input type="hidden" name="rid" value="{{room.rid}}">
     <button type="submit">전송</button>
 </form>
-<input type="hidden" value="{{room.rid}}">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    console.log(document.referrer);
     const socket = io.connect(`http://localhost:8005/chat`, {
         path: '/socket.io',
         //transports: ['websocket']
@@ -62,6 +62,64 @@
         chat.textContent = data.chat;
         div.appendChild(chat);
         document.querySelector('#chat-list').appendChild(div);
+    });
+    socket.on('chat', function (data) {
+        const div = document.createElement('div');
+        if (data.user === '{{user}}') {
+            div.classList.add('mine');
+        } else {
+            div.classList.add('other');
+        }
+        const name = document.createElement('div');
+        name.textContent = data.user;
+        div.appendChild(name);
+        if(data.chat) {
+            const chat = document.createElement('div');
+            chat.textContent = data.chat;
+            div.appendChild(chat);
+        } else {
+            const gif = document.createElement('img');
+            gif.src = '/gif/' + data.gif;
+            gif.classList.add('chat-gif');
+            div.appendChild(gif);
+        }
+        div.style.color = data.user;
+        document.querySelector('#chat-list').appendChild(div);
+    });
+    document.querySelector('#chat-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (e.target.chat.value) {
+            axios.post('/room/{{room.rid}}/chat', {
+                chat: this.chat.value
+            })
+                .then(() => {
+                    e.target.chat.value = '';
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+        }
+        // 아래는 라우터 거치치 않고도 채팅 구현할 수 있는 코드
+        // if (e.target.chat.value) {
+        //     socket.emit('chat', {
+        //         room: '{{room_id}}',
+        //         user: '{{user}}',
+        //         chat: e.target.chat.value
+        //     });
+        //     e.target.chat.value = '';
+        // }
+    });
+    document.querySelector('#gif').addEventListener('change', (e) => {
+        console.log(e.target.files);
+        const formData = new FormData();
+        formData.append('gif', e.target.files[0]);
+        axios.post('/room/{{room.rid}}/gif', formData)
+            .then(() => {
+                e.target.file = null;
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     });
 </script>
 {% endblock %}

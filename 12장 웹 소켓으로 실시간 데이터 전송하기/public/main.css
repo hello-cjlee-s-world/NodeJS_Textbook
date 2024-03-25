@@ -32,3 +32,8 @@ table, table th, table td {
     border: 1px solid silver;
     border-collapse: collapse;
 }
+
+.chat-gif {
+    max-width: 300px;
+
+}
