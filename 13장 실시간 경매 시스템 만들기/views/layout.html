@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="referrer" content="no-referrer-when-downgrade"> <!-- no-referrer-when-downgrade, unsafe-url 일 경우만 referer 전송 -->
+    <link rel="stylesheet" href="/main.css">
+    <title>{{title}}</title>
+</head>
+<body>
+    <div class="container">
+        <div class="profile-wrap">
+            <div class="profile">
+                {% if user and user.id %}
+                <div class="user-name">{{'안녕하세요 ' + user.nick + '님!'}}</div>
+                <div class="user-money">보유자산 : {{user.money}}원</div>
+                <input type="hidden" id="my-id" value="user.id">
+                <a href="/auth/logout" id="logout" class="btn">로그아웃</a>
+                <a href="/good" id="'register" class="btn">상품 등록</a>
+                {% else %}
+                <form id="login-form" action="/auth/login" method="post">
+                    <div class="input-group">
+                        <label for="email">이메일</label>
+                        <input id="email" type="email" name="email" required autofocus>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">비밀번호</label>
+                        <input id="password" type="password" name="password" required>
+                    </div>
+                    <a id="join" href="/join" class="btn">회원가입</a>
+                    <button id="login" type="submit" class="btn">로그인</button>
+                </form>    
+                {% endif %}
+            </div>
+            <footer>
+                Made by&nbsp;
+                <a href="https://github.com/hello-cjlee-s-world" target="_blank">hello-cjlee-s-world</a>
+            </footer>
+            {% block good %}
+            {% endblock %}
+        </div>
+        {% block content %}
+        {% endblock %}
+    </div>
+    <script>
+        window.onload = () => {
+            if(new URL(location.href).searchParams.get('loginError')){
+                alert(new URL(location.href).searchParams.get('loginError'));
+            }
+        };
+    </script>
+    {% block script %}
+    {% endblock %}
+</body>
+</html>
