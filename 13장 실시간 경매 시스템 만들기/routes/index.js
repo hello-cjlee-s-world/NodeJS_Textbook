@@ -2,8 +2,9 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const schedule = require('node-schedule');
 
-const { User, Good, Auction } = require('../models');
+const { Good, User, Auction } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const router = express.Router();
@@ -15,7 +16,7 @@ router.use((req, res, next) => {
 
 router.get('/', async (req, res, next) => {
     try {
-        const goods = await Good.findAll({ where: {SoldId: null}});
+        const goods = await Good.findAll({ where: { SoldId: null }});
         res.render('main', {
             title: 'NodeAuction',
             goods
@@ -58,11 +59,25 @@ const upload = multer({
 router.post('/good', isLoggedIn, upload.single('img'), async (req, res, next) => {
     try {
         const { name, price } = req.body;
-        await Good.create({
+        const good = await Good.create({
             OwnerId: req.user.id,
             name,
             img : req.file.filename,
             price
+        });
+        const end = new Date();
+        end.setDate(end.getDate() + 1); // 하루 뒤
+        schedule.scheduleJob(end, async () => {
+            const success = await Auction.findOne({
+                where: { GoodId: good.id },
+                order: [['bid', 'DESC']]
+            });
+            await Good.update({ SoldId: success.userId }, { where: { id: good.id } });
+            await User.update({
+                money: sequelize.literal(`money - ${success.bid}`)
+            }, {
+                where: {id: success.UserId }
+            });
         });
         res.redirect('/');
     } catch (error) {
@@ -130,6 +145,20 @@ router.post('/good/:id/bid', isLoggedIn, async (req, res, next) => {
         return res.send('ok');
     } catch (error) {
         console.error(error);
+        next(error);
+    }
+});
+
+router.get('/list', isLoggedIn, async (req, res, next) => {
+    try {
+        const goods = await Good.findAll({
+            where: { SoldId: req.user.id },
+            include: { model: Auction },
+            order: [[{ model: Auction  }, 'bid', 'DESC']]
+        })
+        res.render('list', { title: '낙찰 목록 - NodeAuction' , goods });
+    } catch (error) {
+        console.log(error);
         next(error);
     }
 });

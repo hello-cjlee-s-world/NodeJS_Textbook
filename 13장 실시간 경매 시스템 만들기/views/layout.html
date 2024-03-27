@@ -17,7 +17,8 @@
                 <div class="user-money">보유자산 : {{user.money}}원</div>
                 <input type="hidden" id="my-id" value="user.id">
                 <a href="/auth/logout" id="logout" class="btn">로그아웃</a>
-                <a href="/good" id="'register" class="btn">상품 등록</a>
+                <a href="/good" id="register" class="btn">상품 등록</a>
+                <a href="/list" id="list" class="btn">낙찰 물품 조회</a>
                 {% else %}
                 <form id="login-form" action="/auth/login" method="post">
                     <div class="input-group">
